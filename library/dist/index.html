@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/styles.8986bff4.css">
+    <title>Title</title>
+<script src="/styles.8986bff4.js"></script></head>
+<body>
+<div id="container">
+    <div class="header">
+        <div>Your library</div>
+    </div>
+    <div id="bottomContainer">
+        <div class="right-column">
+            <div class="info-container">
+                <div class="info-header">Information</div>
+                <div class="books-stat">
+                    <div class="info">
+                        <h3>Books</h3>
+                        <span id="books-amount">0</span>
+                    </div>
+                    <div class="info">
+                        <h3>Completed Books</h3>
+                        <span id="books-completed">0</span>
+                    </div>
+                    <div class="info">
+                        <h3>Total Pages</h3>
+                        <span id="pages-amout">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="add-book">Add Book+</div>
+            <div id="menuToggle">
+                <input type="checkbox" id="togglerCheckbox">
+                <div class="toggle">
+                    <img src="/plus_more_add_open_circle_button.360ce3ad.svg" alt="add-book">
+                </div>
+            </div>
+
+        </div>
+        <div id="main">
+            <div id="grid-books">
+            </div>
+            <div class="slide-in from-right">
+                <div class="slide-in-content">
+                    <div class="container-form">
+                        <h1 class="form-sentence">Add New Book</h1>
+                        <form id="commentform" class="comment-form" method="post">
+                            <div class="form-form">
+                                <div class="row-input">
+                                    <input id="name" class="input-field" name="name" type="text" value="" pattern="^[^0-9]+$" size="30" maxlength="245" placeholder=" " required="">
+                                    <label class="input-label" for="name">
+                                        <span class="label-name">Name</span>
+                                    </label>
+                                </div>
+                                <div class="row-input">
+                                    <input class="input-field" id="surname" placeholder=" " name="surname" type="text" value="" size="30" maxlength="245" required="">
+                                    <label class="input-label" for="surname" data-help="A girl has no name- Arya Stark">
+                                        <span class="label-name">Surname</span>
+                                    </label>
+                                </div>
+                                <div class="row-input">
+                                    <input class="input-field" id="title" placeholder=" " name="Title" type="text" value="" size="30" maxlength="100" aria-describedby="email-notes" required="">
+                                    <label class="input-label" for="title">
+                                        <span class="label-name">Title</span>
+                                    </label>
+                                </div>
+                                <div class="row-input">
+                                    <input class="input-field" type="number" id="pages" placeholder=" " name="Pages" required="">
+                                    <label class="input-label" for="pages">
+                                        <span class="label-name">Pages</span>
+                                    </label>
+                                </div>
+                                <div class="row-input">
+                                    <input class="input-field" type="number" id="completed_pages" placeholder=" " name="completed_pages" required="">
+                                    <label class="input-label" for="completed_pages">
+                                        <span class="label-name">Completed Pages</span>
+                                    </label>
+                                </div>
+                                <div class="row-input-read">
+                                    <label class="form-control">
+                                        <input id="bookCompletion" type="checkbox" name="checkbox">
+                                        Read?
+                                    </label>
+                                </div>
+                                <div class="form-submit">
+                                    <input name="submit" type="submit" id="submit" class="submit" value="Add Book">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/src.f10117fe.js"></script>
+</body>
+</html>
