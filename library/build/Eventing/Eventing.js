@@ -7,19 +7,25 @@ class Eventing {
     }
     setEvent(name, func) {
         console.log(this.events);
-        if (this.events[name] === undefined) {
+        if (!this.events[name]) {
             this.events[name] = [func];
+            console.log('yey');
         }
         else {
             this.events[name].push(func);
-            console.log('success ???3');
+            console.log(`${name} event function  is properly set.`);
         }
     }
     triggerEvent(funcName) {
-        console.log('ocochidz');
         const functions = this.events[funcName];
-        for (let func of functions) {
-            console.log(func);
+        console.log(functions);
+        if (functions) {
+            for (let func of functions) {
+                func();
+            }
+        }
+        else {
+            console.log('Function is undefined in even compount Library.');
         }
     }
 }

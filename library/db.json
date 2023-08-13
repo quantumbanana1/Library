@@ -1,246 +1,180 @@
 {
   "books": [
     {
-      "title": "Wichura",
+      "title": "xdxd",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "dxdxd",
+        "surname": "xdxdxd"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 11,
+      "completedPages": 1,
+      "completed": true,
       "id": 1
     },
     {
-      "title": "Wichura",
+      "title": "xdxd",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "dxdxd",
+        "surname": "xdxdxd"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 11,
+      "completedPages": 1,
+      "completed": true,
       "id": 2
     },
     {
-      "title": "Wichura",
+      "title": "xdxd",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "dxdxd",
+        "surname": "xdxdxd"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 11,
+      "completedPages": 1,
+      "completed": true,
       "id": 3
     },
     {
-      "title": "Wichura",
+      "title": "xdxd",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxd"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 1,
+      "completedPages": 1,
+      "completed": true,
       "id": 4
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 5
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 6
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 7
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 8
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 9
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 10
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 11
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 12
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 13
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 14
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 15
     },
     {
-      "title": "Wichura",
+      "title": "123",
       "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
+        "name": "xdxd",
+        "surname": "xdxdx"
       },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
+      "pages": 123,
+      "completedPages": 123,
+      "completed": true,
       "id": 16
-    },
-    {
-      "title": "Wichura",
-      "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
-      },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
-      "id": 17
-    },
-    {
-      "title": "Wichura",
-      "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
-      },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
-      "id": 18
-    },
-    {
-      "title": "Wichura",
-      "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
-      },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
-      "id": 19
-    },
-    {
-      "title": "Wichura",
-      "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
-      },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
-      "id": 20
-    },
-    {
-      "title": "Wichura",
-      "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
-      },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
-      "id": 21
-    },
-    {
-      "title": "Wichura",
-      "author": {
-        "name": "Jacek",
-        "surname": "Zimniak"
-      },
-      "completed": false,
-      "completedPages": 120,
-      "pages": 450,
-      "id": 22
     }
   ]
 }

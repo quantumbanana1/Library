@@ -454,29 +454,34 @@ var Eventing = /*#__PURE__*/function () {
     key: "setEvent",
     value: function setEvent(name, func) {
       console.log(this.events);
-      if (this.events[name] === undefined) {
+      if (!this.events[name]) {
         this.events[name] = [func];
+        console.log('yey');
       } else {
         this.events[name].push(func);
-        console.log('success ???3');
+        console.log("".concat(name, " event function  is properly set."));
       }
     }
   }, {
     key: "triggerEvent",
     value: function triggerEvent(funcName) {
-      console.log('ocochidz');
       var functions = this.events[funcName];
-      var _iterator = _createForOfIteratorHelper(functions),
-        _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var func = _step.value;
-          console.log(func);
+      console.log(functions);
+      if (functions) {
+        var _iterator = _createForOfIteratorHelper(functions),
+          _step;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var func = _step.value;
+            func();
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
         }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
+      } else {
+        console.log('Function is undefined in even compount Library.');
       }
     }
   }]);
@@ -529,7 +534,9 @@ var DataBase_1 = require("../DataBase/DataBase");
 var Eventing_1 = require("../Eventing/Eventing");
 var Library = /*#__PURE__*/function () {
   function Library() {
+    var _this = this;
     var books = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    var element = arguments.length > 1 ? arguments[1] : undefined;
     _classCallCheck(this, Library);
     this.db = new DataBase_1.DataBase("http://localhost:3000/books");
     this.books = books;
@@ -537,23 +544,36 @@ var Library = /*#__PURE__*/function () {
     this.totalPages = 0;
     this.booksAmount = 0;
     this.completedPages = 0;
+    this.booksCompleted = 0;
+    this.events.setEvent('addingBook', function () {
+      _this.showBooks(element);
+    });
   }
   _createClass(Library, [{
     key: "populateWithBooks",
     value: function populateWithBooks() {
       return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var _this = this;
-        var books, completedPages, booksAmount, totalPages;
+        var _this2 = this;
+        var books, completedPages, booksAmount, totalPages, completedBooks;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
               _context.prev = 0;
-              _context.next = 3;
+              this.books = [];
+              console.log(this.books);
+              _context.next = 5;
               return this.db.getAll();
-            case 3:
+            case 5:
               books = _context.sent;
+              if (!(books.length === 0)) {
+                _context.next = 9;
+                break;
+              }
+              this.restoreToDefault();
+              return _context.abrupt("return");
+            case 9:
               books.map(function (book) {
-                _this.books.push(new Book_1.Book(book));
+                _this2.books.push(new Book_1.Book(book));
               });
               completedPages = this.books.reduce(function (accumulator, currentBook) {
                 return accumulator + currentBook.dataBook.date.completedPages;
@@ -562,79 +582,133 @@ var Library = /*#__PURE__*/function () {
               totalPages = this.books.reduce(function (accumulator, currentBook) {
                 return accumulator + currentBook.dataBook.date.pages;
               }, 0);
+              completedBooks = this.books.reduce(function (accumulator, currentBook) {
+                var counter = 0;
+                if (currentBook.dataBook.date.completed) {
+                  counter++;
+                }
+                return accumulator + counter;
+              }, 0);
               this.totalPages = totalPages;
               this.booksAmount = booksAmount;
               this.completedPages = completedPages;
+              this.booksCompleted = completedBooks;
               console.log(" populating is finished ");
-              _context.next = 18;
+              _context.next = 25;
               break;
-            case 14:
-              _context.prev = 14;
+            case 21:
+              _context.prev = 21;
               _context.t0 = _context["catch"](0);
               console.log("Something went wrong while populating array with books");
               console.error(_context.t0);
-            case 18:
+            case 25:
             case "end":
               return _context.stop();
           }
-        }, _callee, this, [[0, 14]]);
+        }, _callee, this, [[0, 21]]);
       }));
     }
   }, {
     key: "getTotalBooks",
-    value: function getTotalBooks() {
+    get: function get() {
       return this.booksAmount;
     }
   }, {
+    key: "getBooksCompleted",
+    get: function get() {
+      return this.booksCompleted;
+    }
+  }, {
     key: "getCompletedPages",
-    value: function getCompletedPages() {
+    get: function get() {
       return this.completedPages;
     }
   }, {
     key: "removeAllBooks",
     value: function removeAllBooks() {
-      if (this.books.length === 0) {
-        console.log("No record to delete");
-      } else {
-        this.books.map(function (book) {
-          book.remove();
-        });
-      }
+      var _this3 = this;
+      this.populateWithBooks().then(function () {
+        if (_this3.books.length === 0) {
+          console.log("No record to delete");
+        } else {
+          _this3.books.map(function (book) {
+            book.remove();
+          });
+        }
+      }).then(this.populateWithBooks);
     }
   }, {
     key: "addBook",
     value: function addBook(root) {
-      if (root === null) {
-        console.log("root element is null");
-        return;
-      }
-      if (root.checkValidity()) {
-        var name = document.getElementById('name');
-        var surname = document.getElementById('surname');
-        var title = document.getElementById('title');
-        var pages = document.getElementById('pages');
-        var completedPages = document.getElementById('completed_pages');
-        var completed = document.getElementById('bookCompletion');
-        if (pages < completedPages) {
-          var message = "You can't have more completed pages than actual number of book's pages";
-        }
-        if (name && surname && title && pages && completedPages && completed) {
-          var dataBook = {
-            title: title.value,
-            author: {
-              name: name.value,
-              surname: surname.value
-            },
-            pages: parseInt(pages.value),
-            completedPages: parseInt(completedPages.value),
-            completed: completed.checked
-          };
-          var book = new Book_1.Book(dataBook);
-        }
-      } else {
-        console.log('Incorrect input values from form');
-        return;
-      }
+      return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var _this4 = this;
+        var name, surname, title, pages, completedPages, completed, bookButton, message, dataBook, book;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!(root === null)) {
+                _context3.next = 5;
+                break;
+              }
+              console.log("root element is null");
+              return _context3.abrupt("return");
+            case 5:
+              if (!root.checkValidity()) {
+                _context3.next = 17;
+                break;
+              }
+              name = document.getElementById('name');
+              surname = document.getElementById('surname');
+              title = document.getElementById('title');
+              pages = document.getElementById('pages');
+              completedPages = document.getElementById('completed_pages');
+              completed = document.getElementById('bookCompletion');
+              bookButton = document.getElementById('submit');
+              if (pages < completedPages) {
+                message = "You can't have more completed pages than actual number of book's pages";
+              }
+              if (name && surname && title && pages && completedPages && completed && bookButton) {
+                dataBook = {
+                  title: title.value,
+                  author: {
+                    name: name.value,
+                    surname: surname.value
+                  },
+                  pages: parseInt(pages.value),
+                  completedPages: parseInt(completedPages.value),
+                  completed: completed.checked
+                };
+                book = new Book_1.Book(dataBook);
+                book.save().then(function () {
+                  return __awaiter(_this4, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+                    var _this5 = this;
+                    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+                      while (1) switch (_context2.prev = _context2.next) {
+                        case 0:
+                          console.log('saving xdxdxd...');
+                          _context2.next = 3;
+                          return this.populateWithBooks().then(function () {
+                            _this5.triggerEvent('addingBook');
+                          });
+                        case 3:
+                        case "end":
+                          return _context2.stop();
+                      }
+                    }, _callee2, this);
+                  }));
+                });
+              }
+              _context3.next = 19;
+              break;
+            case 17:
+              console.log('Incorrect input values from form');
+              return _context3.abrupt("return");
+            case 19:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3);
+      }));
     }
   }, {
     key: "setEvent",
@@ -642,27 +716,46 @@ var Library = /*#__PURE__*/function () {
       return this.events.setEvent(key, func);
     }
   }, {
+    key: "triggerEvent",
+    value: function triggerEvent(funcName) {
+      return this.events.triggerEvent(funcName);
+    }
+  }, {
     key: "showBooks",
     value: function showBooks(element) {
+      if (!element) {
+        console.log('Root element is undefined');
+        return;
+      }
+      element.innerHTML = '';
       if (this.books.length === 0) {
         console.log('No books to show');
         return;
-      } else {
-        var innerHTML = '';
-        var progress = '';
-        this.books.map(function (book) {
-          if (book.getProperty('completed')) {
-            progress = 'Read';
-          } else {
-            progress = 'on progress';
-          }
-          var author = book.getProperty('author');
-          var templateHTML = "<div class=\"book\">\n                    <div id=\"titleMenu\">Title: <span>".concat(book.getProperty('title'), "</span></div>\n                    <div id=\"authorMenu\">Author: <span>").concat(author.name, " ").concat(author.surname, "</span></div>\n                    <div id=\"Pages\">Pages: <span>").concat(book.getProperty('pages'), "</span></div>\n                    <div id=\"completed_pages\">Complited Pages: <span>").concat(book.getProperty('completedPages'), "</span></div>\n                    <div id=\"buttonsMenu\">\n                        <button>Delete</button>\n                        <button>Edit</button>\n                        <button>Read</button>\n                    </div>\n                    <div id=\"status\">").concat(progress, "</div>\n                </div>");
-          innerHTML += templateHTML;
-          element.innerHTML = innerHTML;
-          console.log('Showing books finished...');
-        });
       }
+      var progress = '';
+      this.books.forEach(function (book) {
+        console.log('xxxxxxxxxxx');
+        console.log(book, 'xd');
+        if (book.getProperty('completed')) {
+          progress = 'Read';
+        } else {
+          progress = 'On progress';
+        }
+        var author = book.getProperty('author');
+        var div = document.createElement('div');
+        div.classList.add('book');
+        var templateHTML = "\n            <div id=\"titleMenu\">Title: <span>".concat(book.getProperty('title'), "</span></div>\n            <div id=\"authorMenu\">Author: <span>").concat(author.name, " ").concat(author.surname, "</span></div>\n            <div id=\"pages-amount\">Pages: <span>").concat(book.getProperty('pages'), "</span></div>\n            <div id=\"Gcompleted_pages\">Completed Pages: <span>").concat(book.getProperty('completedPages'), "</span></div>\n            <div id=\"buttonsMenu\">\n                <button>Delete</button>\n                <button>Edit</button>\n                <button>Read</button>\n            </div>\n            <div id=\"status\">").concat(progress, "</div>");
+        div.innerHTML = templateHTML;
+        element.appendChild(div);
+      });
+    }
+  }, {
+    key: "restoreToDefault",
+    value: function restoreToDefault() {
+      this.totalPages = 0;
+      this.booksAmount = 0;
+      this.completedPages = 0;
+      this.booksCompleted = 0;
     }
   }]);
   return Library;
@@ -671,7 +764,6 @@ exports.Library = Library;
 },{"../Book/Book":"src/Book/Book.ts","../DataBase/DataBase":"src/DataBase/DataBase.ts","../Eventing/Eventing":"src/Eventing/Eventing.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
-var _this = this;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -687,53 +779,75 @@ var bottomContainer = document.getElementById('bottomContainer');
 var container = document.getElementById('container');
 mainBox.style.height = "".concat(gridList.clientHeight, "px");
 var element = document.querySelector('.slide-in.from-right');
-// Add the desired height and width
-console.log(form);
-var Book_1 = require("./Book/Book");
-toggleButton.addEventListener('change', function () {
-  if (this.checked) {
-    slide[0].classList.add('show');
-    gridList.classList.remove('active');
-    if (gridList.clientHeight < bottomContainer.clientHeight) {
-      element.style.height = "".concat(bottomContainer.clientHeight + 150, "px"); // Set the height you want
-      element.style.width = "".concat(bottomContainer.clientWidth / 2, "px");
+var submitButton = document.getElementById('submit');
+var booksAmount = document.getElementById('books-amount');
+var booksCompleted = document.getElementById('books-completed');
+var pagesCompleted = document.getElementById('pages-amount-info');
+if (toggleButton) {
+  toggleButton.addEventListener('change', function () {
+    console.log(window.innerWidth);
+    if (this.checked && gridList && element && bottomContainer) {
+      slide[0].classList.add('show');
+      gridList.classList.remove('active');
+      if (gridList.clientHeight < bottomContainer.clientHeight) {
+        element.style.height = "".concat(bottomContainer.clientHeight + 150, "px"); // Set the height you want
+        element.style.width = "".concat(bottomContainer.clientWidth / 2, "px");
+      } else {
+        element.style.height = "".concat(gridList.clientHeight + 150, "px"); // Set the height you want
+        element.style.width = "".concat(gridList.clientWidth / 2, "px"); // Set the width you want
+      }
     } else {
-      element.style.height = "".concat(gridList.clientHeight + 150, "px"); // Set the height you want
-      element.style.width = "".concat(gridList.clientWidth / 2, "px"); // Set the width you want
+      element.style.height = "".concat(0, "px"); // Set the height you want
+      element.style.width = "".concat(0, "px");
+      slide[0].classList.remove('show');
+      if (gridList) {
+        gridList.classList.add('active');
+      }
     }
-  } else {
-    element.style.height = "".concat(0, "px"); // Set the height you want
-    element.style.width = "".concat(0, "px");
-    slide[0].classList.remove('show');
-    gridList.classList.add('active');
-  }
-});
-var library = new Library_1.Library();
-library.populateWithBooks().then(function () {
-  if (library.books.length === 0) {
-    setTimeout(function () {
-      return;
-    }, 300);
-  }
-  console.log(library.books);
-  var book1 = new Book_1.Book({
-    title: "Wichura",
-    author: {
-      name: "Jacek",
-      surname: "Zimniak"
-    },
-    completed: false,
-    completedPages: 120,
-    pages: 450
   });
-  library.setEvent("addingBook", function () {
-    _this.showbooks(gridList);
+}
+var library;
+library = new Library_1.Library([], form);
+if (library) {
+  library.populateWithBooks().then(function () {
+    booksAmount.innerHTML = "".concat(library.getTotalBooks);
+    booksCompleted.innerHTML = "".concat(library.getBooksCompleted);
+    pagesCompleted.innerHTML = "".concat(library.getCompletedPages);
+    if (gridList) {
+      library.showBooks(gridList);
+      mainBox.style.height = "".concat(gridList.clientHeight, "px");
+      if (form && mainBox) {
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          library.addBook(form).then(function () {
+            console.log('New book is adding...');
+            mainBox.style.height = "".concat(gridList.clientHeight, "px");
+            if (mainBox.style.height !== gridList.clientHeight) {
+              console.log('it isnt the sameee!');
+              mainBox.style.height = "".concat(gridList.clientHeight + 270, "px");
+            }
+          });
+        });
+      } else {
+        console.log('no form or mainBox to adjust.');
+      }
+    } else {
+      console.log('Grid list is undefined');
+    }
   });
-  library.events.triggerEvent('addingBook');
-  book1.save();
-  library.showBooks(gridList);
-});
-},{"./Library/Library":"src/Library/Library.ts","./Book/Book":"src/Book/Book.ts"}],"../../../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+}
+// library.populateWithBooks().then(() => {
+//     if (library.books.length === 0) {
+//         setTimeout(() => {
+//             return;
+//         }, 300)
+//
+//     }
+// library.events.triggerEvent('addingBook');
+// book1.save();
+// library.showBooks(gridList);library.removeAllBooks();
+// });
+},{"./Library/Library":"src/Library/Library.ts"}],"../../../../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -758,7 +872,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49506" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49947" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
@@ -902,5 +1016,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/index.ts"], null)
+},{}]},{},["../../../../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/index.ts"], null)
 //# sourceMappingURL=/src.f10117fe.js.map

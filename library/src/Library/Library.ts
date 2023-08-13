@@ -12,18 +12,32 @@ export class Library {
     public completedPages: number
     public totalPages: number
     public booksAmount: number
+    public booksCompleted: number
 
-    constructor(books: Book[] = []) {
+    constructor(books: Book[] = [], element: HTMLElement) {
         this.books = books;
         this.events = new Eventing();
         this.totalPages = 0;
         this.booksAmount = 0;
         this.completedPages = 0;
+        this.booksCompleted = 0;
+        this.events.setEvent('addingBook', () => {
+            this.showBooks(element)
+
+
+        })
+
     }
 
     async populateWithBooks() {
         try {
+            this.books = [];
+            console.log(this.books);
             const books: IBook[] = await this.db.getAll()
+            if (books.length === 0) {
+                this.restoreToDefault();
+                return;
+            }
             books.map((book: IBook) => {
                 this.books.push(new Book(book));
             })
@@ -37,9 +51,18 @@ export class Library {
 
             }, 0);
 
+            const completedBooks = this.books.reduce((accumulator:number, currentBook:Book):number => {
+                let counter = 0;
+                if (currentBook.dataBook.date.completed) {
+                    counter++;
+                }
+                return accumulator + counter;
+            },0)
+
             this.totalPages = totalPages;
             this.booksAmount = booksAmount;
             this.completedPages = completedPages;
+            this.booksCompleted = completedBooks;
             console.log(` populating is finished `);
 
 
@@ -52,69 +75,89 @@ export class Library {
     }
 
 
-    getTotalBooks() {
+    get getTotalBooks():number {
         return this.booksAmount
 
 
     }
 
+    get getBooksCompleted(): number {
+        return this.booksCompleted;
 
-    getCompletedPages(): number {
+    }
+
+
+    get getCompletedPages(): number {
         return this.completedPages;
 
     }
 
     removeAllBooks() {
-        if (this.books.length === 0) {
-            console.log("No record to delete")
+        this.populateWithBooks().then(() => {
+            if (this.books.length === 0) {
+                console.log("No record to delete")
 
-        } else {
-            this.books.map((book: Book) => {
-                book.remove()
+            } else {
+                this.books.map((book: Book) => {
+                    book.remove()
 
-            })
-        }
+                })
+            }
+
+        }).then(this.populateWithBooks)
+
     }
 
 
-    addBook(root: HTMLFormElement | null) {
+    async addBook(root: HTMLFormElement) {
+
+
         if (root === null) {
             console.log("root element is null");
             return;
-        }
+        } else {
 
-        if (root.checkValidity()) {
-            const name = document.getElementById('name') as HTMLInputElement;
-            const surname = document.getElementById('surname') as HTMLInputElement;
-            const title = document.getElementById('title') as HTMLInputElement;
-            const pages = document.getElementById('pages') as HTMLInputElement;
-            const completedPages = document.getElementById('completed_pages') as HTMLInputElement;
-            const completed = document.getElementById('bookCompletion') as HTMLInputElement;
 
-            if(pages < completedPages) {
-                const message:string = "You can't have more completed pages than actual number of book's pages"
-            }
+            if (root.checkValidity()) {
+                const name = document.getElementById('name') as HTMLInputElement;
+                const surname = document.getElementById('surname') as HTMLInputElement;
+                const title = document.getElementById('title') as HTMLInputElement;
+                const pages = document.getElementById('pages') as HTMLInputElement;
+                const completedPages = document.getElementById('completed_pages') as HTMLInputElement;
+                const completed = document.getElementById('bookCompletion') as HTMLInputElement;
+                const bookButton = document.getElementById('submit');
 
-            if (name && surname && title && pages && completedPages && completed) {
-                const dataBook: IBook = {
-                    title: title.value,
-                    author: {name: name.value, surname: surname.value},
-                    pages: parseInt(pages.value),
-                    completedPages: parseInt(completedPages.value),
-                    completed: completed.checked,
+                if (pages < completedPages) {
+                    const message: string = "You can't have more completed pages than actual number of book's pages"
                 }
 
-                const book = new Book(dataBook)
+                if (name && surname && title && pages && completedPages && completed && bookButton) {
+                    const dataBook: IBook = {
+                        title: title.value,
+                        author: {name: name.value, surname: surname.value},
+                        pages: parseInt(pages.value),
+                        completedPages: parseInt(completedPages.value),
+                        completed: completed.checked,
+                    }
+
+                    const book = new Book(dataBook)
+                    book.save().then(async () => {
+                        console.log('saving xdxdxd...')
+                        await this.populateWithBooks().then(() => {
+                            this.triggerEvent('addingBook')
+                        });
+                    });
 
 
+                }
+
+
+            } else {
+                console.log('Incorrect input values from form');
+                return;
             }
 
-
-        } else {
-            console.log('Incorrect input values from form');
-            return;
         }
-
     }
 
 
@@ -123,41 +166,63 @@ export class Library {
 
     }
 
-    showBooks(element: HTMLElement) {
-        if (this.books.length === 0) {
-            console.log('No books to show');
-            return;
-
-        } else {
-            let innerHTML = '';
-            let progress = '';
-            this.books.map((book) => {
-                if (book.getProperty('completed')) {
-                    progress = 'Read'
-                } else {
-                    progress='on progress'
-                }
-                const author = book.getProperty('author');
-
-                const templateHTML = `<div class="book">
-                    <div id="titleMenu">Title: <span>${book.getProperty('title')}</span></div>
-                    <div id="authorMenu">Author: <span>${author.name} ${author.surname}</span></div>
-                    <div id="Pages">Pages: <span>${book.getProperty('pages')}</span></div>
-                    <div id="completed_pages">Complited Pages: <span>${book.getProperty('completedPages')}</span></div>
-                    <div id="buttonsMenu">
-                        <button>Delete</button>
-                        <button>Edit</button>
-                        <button>Read</button>
-                    </div>
-                    <div id="status">${progress}</div>
-                </div>`
-                innerHTML += templateHTML;
-                element.innerHTML = innerHTML;
-                console.log('Showing books finished...');
-            })
-        }
+    triggerEvent(funcName: string) {
+        return this.events.triggerEvent(funcName);
 
     }
 
+    showBooks(element: HTMLElement) {
+        if (!element) {
+            console.log('Root element is undefined');
+            return;
+        }
+
+        element.innerHTML = '';
+
+        if (this.books.length === 0) {
+            console.log('No books to show');
+            return;
+        }
+
+        let progress = '';
+        this.books.forEach((book: Book) => {
+            console.log('xxxxxxxxxxx');
+            console.log(book, 'xd');
+
+            if (book.getProperty('completed')) {
+                progress = 'Read';
+            } else {
+                progress = 'On progress';
+            }
+
+            const author = book.getProperty('author');
+            const div = document.createElement('div');
+            div.classList.add('book');
+
+            const templateHTML = `
+            <div id="titleMenu">Title: <span>${book.getProperty('title')}</span></div>
+            <div id="authorMenu">Author: <span>${author.name} ${author.surname}</span></div>
+            <div id="pages-amount">Pages: <span>${book.getProperty('pages')}</span></div>
+            <div id="Gcompleted_pages">Completed Pages: <span>${book.getProperty('completedPages')}</span></div>
+            <div id="buttonsMenu">
+                <button>Delete</button>
+                <button>Edit</button>
+                <button>Read</button>
+            </div>
+            <div id="status">${progress}</div>`;
+
+            div.innerHTML = templateHTML;
+            element.appendChild(div);
+        });
+    }
+
+
+    restoreToDefault():void {
+        this.totalPages = 0
+        this.booksAmount = 0
+        this.completedPages = 0
+        this.booksCompleted = 0
+
+    }
 
 }
