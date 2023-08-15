@@ -13,8 +13,10 @@ exports.Library = void 0;
 const Book_1 = require("../Book/Book");
 const DataBase_1 = require("../DataBase/DataBase");
 const Eventing_1 = require("../Eventing/Eventing");
+class HTMLElementForm {
+}
 class Library {
-    constructor(books = [], element) {
+    constructor(books = [], elementForm, outputElement) {
         this.db = new DataBase_1.DataBase("http://localhost:3000/books");
         this.books = books;
         this.events = new Eventing_1.Eventing();
@@ -23,14 +25,16 @@ class Library {
         this.completedPages = 0;
         this.booksCompleted = 0;
         this.events.setEvent('addingBook', () => {
-            this.showBooks(element);
+            this.showBooks(outputElement);
+        });
+        this.events.setEvent('deletingBook', () => {
+            this.showBooks(outputElement);
         });
     }
     populateWithBooks() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 this.books = [];
-                console.log(this.books);
                 const books = yield this.db.getAll();
                 if (books.length === 0) {
                     this.restoreToDefault();
@@ -80,11 +84,13 @@ class Library {
                 console.log("No record to delete");
             }
             else {
-                this.books.map((book) => {
-                    book.remove();
-                });
+                this.books.map((book) => __awaiter(this, void 0, void 0, function* () {
+                    yield book.remove();
+                    yield this.populateWithBooks();
+                    this.triggerEvent('deletingBook');
+                }));
             }
-        }).then(this.populateWithBooks);
+        });
     }
     addBook(root) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -140,37 +146,40 @@ class Library {
             return;
         }
         element.innerHTML = '';
-        if (this.books.length === 0) {
-            console.log('No books to show');
-            return;
-        }
-        let progress = '';
-        this.books.forEach((book) => {
-            console.log('xxxxxxxxxxx');
-            console.log(book, 'xd');
-            if (book.getProperty('completed')) {
-                progress = 'Read';
-            }
-            else {
-                progress = 'On progress';
-            }
-            const author = book.getProperty('author');
-            const div = document.createElement('div');
-            div.classList.add('book');
-            const templateHTML = `
+        if (this.books.length !== 0) {
+            let progress = '';
+            this.books.forEach((book) => {
+                if (book.getProperty('completed')) {
+                    progress = 'Read';
+                }
+                else {
+                    progress = 'On progress';
+                }
+                const author = book.getProperty('author');
+                const div = document.createElement('div');
+                div.classList.add(`book`);
+                div.classList.add(`${book.getProperty("id")}`);
+                3;
+                const templateHTML = `
             <div id="titleMenu">Title: <span>${book.getProperty('title')}</span></div>
             <div id="authorMenu">Author: <span>${author.name} ${author.surname}</span></div>
             <div id="pages-amount">Pages: <span>${book.getProperty('pages')}</span></div>
             <div id="Gcompleted_pages">Completed Pages: <span>${book.getProperty('completedPages')}</span></div>
             <div id="buttonsMenu">
-                <button>Delete</button>
-                <button>Edit</button>
-                <button>Read</button>
+                <button id="dlt-btn${book.getProperty('id')}">Delete</button>
+                <button id="edit-btn${book.getProperty('id')}">Edit</button>
+                <button id="completion-btn${book.getProperty('id')}">Read</button>
             </div>
-            <div id="status">${progress}</div>`;
-            div.innerHTML = templateHTML;
-            element.appendChild(div);
-        });
+            <div id="status"><span>${progress}</span><span>${book.getStatusPercentage.toFixed(0)}%</span></div>`;
+                div.innerHTML = templateHTML;
+                element.appendChild(div);
+            });
+        }
+        else {
+            if (this.books.length === 0) {
+                element.innerHTML = '';
+            }
+        }
     }
     restoreToDefault() {
         this.totalPages = 0;

@@ -16,12 +16,13 @@ const submitButton = document.getElementById('submit');
 const booksAmount = document.getElementById('books-amount');
 const booksCompleted = document.getElementById('books-completed');
 const pagesCompleted = document.getElementById('pages-amount-info');
-if (toggleButton) {
+const deleteBttn = document.getElementById('deleteBtn');
+if (toggleButton && gridList && element && bottomContainer && deleteBttn) {
     toggleButton.addEventListener('change', function () {
-        console.log(window.innerWidth);
-        if (this.checked && gridList && element && bottomContainer) {
+        if (this.checked) {
             slide[0].classList.add('show');
             gridList.classList.remove('active');
+            // deleteBttn.classList.add('hide');
             if (gridList.clientHeight < bottomContainer.clientHeight) {
                 element.style.height = `${bottomContainer.clientHeight + 150}px`; // Set the height you want
                 element.style.width = `${bottomContainer.clientWidth / 2}px`;
@@ -35,6 +36,7 @@ if (toggleButton) {
             element.style.height = `${0}px`; // Set the height you want
             element.style.width = `${0}px`;
             slide[0].classList.remove('show');
+            // deleteBttn.classList.remove('hide');
             if (gridList) {
                 gridList.classList.add('active');
             }
@@ -42,36 +44,43 @@ if (toggleButton) {
     });
 }
 let library;
-library = new Library_1.Library([], form);
-if (library) {
-    library.populateWithBooks().then(() => {
-        booksAmount.innerHTML = `${library.getTotalBooks}`;
-        booksCompleted.innerHTML = `${library.getBooksCompleted}`;
-        pagesCompleted.innerHTML = `${library.getCompletedPages}`;
-        if (gridList) {
-            library.showBooks(gridList);
-            mainBox.style.height = `${gridList.clientHeight}px`;
-            if (form && mainBox) {
-                form.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    library.addBook(form).then(() => {
-                        console.log('New book is adding...');
-                        mainBox.style.height = `${gridList.clientHeight}px`;
-                        if (mainBox.style.height !== gridList.clientHeight) {
-                            console.log('it isnt the sameee!');
-                            mainBox.style.height = `${gridList.clientHeight + 270}px`;
-                        }
+if (form && gridList) {
+    library = new Library_1.Library([], form, gridList);
+    if (library) {
+        library.populateWithBooks().then(() => {
+            booksAmount.innerHTML = `${library.getTotalBooks}`;
+            booksCompleted.innerHTML = `${library.getBooksCompleted}`;
+            pagesCompleted.innerHTML = `${library.getCompletedPages}`;
+            if (gridList) {
+                library.showBooks(gridList);
+                mainBox.style.height = `${gridList.clientHeight}px`;
+                if (form && mainBox) {
+                    form.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        library.addBook(form).then(() => {
+                            console.log('New book is adding...');
+                            mainBox.style.height = `${gridList.clientHeight}px`;
+                            // @ts-ignore
+                            if (mainBox.style.height !== gridList.clientHeight) {
+                                mainBox.style.height = `${gridList.clientHeight + 270}px`;
+                            }
+                        });
                     });
-                });
+                    if (deleteBttn) {
+                        deleteBttn.addEventListener('click', () => {
+                            library.removeAllBooks();
+                        });
+                    }
+                }
+                else {
+                    console.log('no form or mainBox to adjust.');
+                }
             }
             else {
-                console.log('no form or mainBox to adjust.');
+                console.log('Grid list is undefined');
             }
-        }
-        else {
-            console.log('Grid list is undefined');
-        }
-    });
+        });
+    }
 }
 // library.populateWithBooks().then(() => {
 //     if (library.books.length === 0) {

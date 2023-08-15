@@ -12,11 +12,27 @@ html, body {
 }
 
 .header {
+    justify-content: space-between;
     display: flex;
     background: white;
     align-items: center;
     padding-left: 20px;
+    padding-right: 20px;
 
+}
+
+#deleteBtn > button {
+    height: 50px;
+    background-color: darkred;
+    color: white;
+    border-radius: 20px;
+    border-style: none;
+    font-weight: bolder;
+
+}
+
+#deleteBtn {
+    z-index: 1;
 }
 
 .header > div {
@@ -473,9 +489,15 @@ input[type="checkbox"]::before {
 }
 
 #status {
+    display: flex;
+    justify-content: space-between;
     background-color: rgba(55, 136, 59, 0.32);
 }
 
+.hide {
+    z-index: -1;
+
+}
 
 
 

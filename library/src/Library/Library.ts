@@ -3,6 +3,9 @@ import {DataBase} from "../DataBase/DataBase";
 import {Eventing} from "../Eventing/Eventing";
 
 
+class HTMLElementForm {
+}
+
 export class Library {
     books: Book[];
     public db: DataBase<IBook> = new DataBase<IBook>(
@@ -14,7 +17,7 @@ export class Library {
     public booksAmount: number
     public booksCompleted: number
 
-    constructor(books: Book[] = [], element: HTMLElement) {
+    constructor(books: Book[] = [], elementForm: HTMLElementForm,outputElement:HTMLElement) {
         this.books = books;
         this.events = new Eventing();
         this.totalPages = 0;
@@ -22,9 +25,10 @@ export class Library {
         this.completedPages = 0;
         this.booksCompleted = 0;
         this.events.setEvent('addingBook', () => {
-            this.showBooks(element)
-
-
+            this.showBooks(outputElement)
+        })
+        this.events.setEvent('deletingBook', () => {
+            this.showBooks(outputElement);
         })
 
     }
@@ -32,7 +36,6 @@ export class Library {
     async populateWithBooks() {
         try {
             this.books = [];
-            console.log(this.books);
             const books: IBook[] = await this.db.getAll()
             if (books.length === 0) {
                 this.restoreToDefault();
@@ -92,22 +95,23 @@ export class Library {
 
     }
 
-    removeAllBooks() {
-        this.populateWithBooks().then(() => {
+        removeAllBooks() {
+         this.populateWithBooks().then(() => {
             if (this.books.length === 0) {
                 console.log("No record to delete")
 
             } else {
-                this.books.map((book: Book) => {
-                    book.remove()
+                this.books.map(async (book: Book) => {
+                    await book.remove();
+                    await this.populateWithBooks();
+                    this.triggerEvent('deletingBook')
 
                 })
             }
 
-        }).then(this.populateWithBooks)
+        })
 
     }
-
 
     async addBook(root: HTMLFormElement) {
 
@@ -176,44 +180,50 @@ export class Library {
             console.log('Root element is undefined');
             return;
         }
+        element.innerHTML = ''
 
-        element.innerHTML = '';
 
-        if (this.books.length === 0) {
-            console.log('No books to show');
-            return;
-        }
 
-        let progress = '';
-        this.books.forEach((book: Book) => {
-            console.log('xxxxxxxxxxx');
-            console.log(book, 'xd');
 
-            if (book.getProperty('completed')) {
-                progress = 'Read';
-            } else {
-                progress = 'On progress';
-            }
 
-            const author = book.getProperty('author');
-            const div = document.createElement('div');
-            div.classList.add('book');
+        if (this.books.length !== 0) {
+            let progress = '';
+            this.books.forEach((book: Book) => {
 
-            const templateHTML = `
+                if (book.getProperty('completed')) {
+                    progress = 'Read';
+                } else {
+                    progress = 'On progress';
+                }
+
+                const author = book.getProperty('author');
+                const div = document.createElement('div');
+                div.classList.add(`book`);
+                div.classList.add(`${book.getProperty("id")}`)
+                3
+                const templateHTML = `
             <div id="titleMenu">Title: <span>${book.getProperty('title')}</span></div>
             <div id="authorMenu">Author: <span>${author.name} ${author.surname}</span></div>
             <div id="pages-amount">Pages: <span>${book.getProperty('pages')}</span></div>
             <div id="Gcompleted_pages">Completed Pages: <span>${book.getProperty('completedPages')}</span></div>
             <div id="buttonsMenu">
-                <button>Delete</button>
-                <button>Edit</button>
-                <button>Read</button>
+                <button id="dlt-btn${book.getProperty('id')}">Delete</button>
+                <button id="edit-btn${book.getProperty('id')}">Edit</button>
+                <button id="completion-btn${book.getProperty('id')}">Read</button>
             </div>
-            <div id="status">${progress}</div>`;
+            <div id="status"><span>${progress}</span><span>${book.getStatusPercentage.toFixed(0)}%</span></div>`;
 
-            div.innerHTML = templateHTML;
-            element.appendChild(div);
-        });
+                div.innerHTML = templateHTML;
+                element.appendChild(div);
+            });
+
+        } else {
+            if (this.books.length === 0 ) {
+                element.innerHTML = '';
+            }
+        }
+
+
     }
 
 

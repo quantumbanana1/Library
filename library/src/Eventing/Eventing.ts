@@ -13,10 +13,8 @@ export class Eventing {
     }
 
     setEvent(name: string, func: () =>{}): void {
-        console.log(this.events)
         if (!this.events[name]) {
             this.events[name] = [func];
-            console.log('yey')
         }
         else {
             this.events[name].push(func);

@@ -33,7 +33,7 @@ export class Book {
     }
 
 
-    remove() {
+    async remove() {
         if (this.dataBook.date.id) {
             return this.db.removeItem(this.dataBook.date.id);
         } else {
