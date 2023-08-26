@@ -267,8 +267,8 @@ var DataBase = /*#__PURE__*/function () {
               throw new Error("Failed to fetch items from the database.");
             case 7:
               _context2.next = 9;
-              return response.json().then(function (books) {
-                return books;
+              return response.json().then(function (item) {
+                return item;
               });
             case 9:
               items = _context2.sent;
@@ -288,21 +288,11 @@ var DataBase = /*#__PURE__*/function () {
     key: "updateItem",
     value: function updateItem(id, newData) {
       return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var response, requestOptions, item;
+        var requestOptions, response, item;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _context3.next = 2;
-              return fetch(this.url + "/".concat(id));
-            case 2:
-              response = _context3.sent;
-              _context3.prev = 3;
-              if (response.ok) {
-                _context3.next = 6;
-                break;
-              }
-              throw new Error("Failure occurred while updating");
-            case 6:
+              _context3.prev = 0;
               requestOptions = {
                 method: "PUT",
                 headers: {
@@ -310,19 +300,31 @@ var DataBase = /*#__PURE__*/function () {
                 },
                 body: JSON.stringify(newData)
               };
-              item = response.json();
-              console.log("Successfully updated ".concat(item));
-              _context3.next = 14;
-              break;
-            case 11:
-              _context3.prev = 11;
-              _context3.t0 = _context3["catch"](3);
-              console.error(_context3.t0.message);
+              _context3.next = 4;
+              return fetch(this.url + "/".concat(id), requestOptions);
+            case 4:
+              response = _context3.sent;
+              if (response.ok) {
+                _context3.next = 7;
+                break;
+              }
+              throw new Error("Failure occurred while updating");
+            case 7:
+              _context3.next = 9;
+              return response.json;
+            case 9:
+              item = _context3.sent;
+              console.log("Successfully updated item with new date - ".concat(newData));
+              return _context3.abrupt("return", item);
             case 14:
+              _context3.prev = 14;
+              _context3.t0 = _context3["catch"](0);
+              console.error(_context3.t0.message);
+            case 17:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, this, [[3, 11]]);
+        }, _callee3, this, [[0, 14]]);
       }));
     }
   }, {
@@ -363,6 +365,39 @@ var DataBase = /*#__PURE__*/function () {
               return _context4.stop();
           }
         }, _callee4, this, [[4, 11]]);
+      }));
+    }
+  }, {
+    key: "get",
+    value: function get(id) {
+      return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var data, response, item;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              _context5.prev = 0;
+              _context5.next = 3;
+              return fetch(this.url + "/".concat(id));
+            case 3:
+              response = _context5.sent;
+              if (response.ok) {
+                _context5.next = 7;
+                break;
+              }
+              console.log("Connection failure");
+              throw new Error("Failed to fetch items from the database.");
+            case 7:
+              item = response.json();
+              return _context5.abrupt("return", item);
+            case 11:
+              _context5.prev = 11;
+              _context5.t0 = _context5["catch"](0);
+              console.error(_context5.t0.message);
+            case 14:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, this, [[0, 11]]);
       }));
     }
   }]);
@@ -464,6 +499,11 @@ var Book = /*#__PURE__*/function () {
     value: function getProperty(key) {
       return this.dataBook.get(key);
     }
+  }, {
+    key: "put",
+    value: function put(id, date) {
+      return this.db.updateItem(id, date);
+    }
   }]);
   return Book;
 }();
@@ -486,21 +526,20 @@ Object.defineProperty(exports, "__esModule", {
 exports.Eventing = void 0;
 var Eventing = /*#__PURE__*/function () {
   function Eventing() {
+    var _this = this;
     var events = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     _classCallCheck(this, Eventing);
     this.events = events;
-  }
-  _createClass(Eventing, [{
-    key: "setEvent",
-    value: function setEvent(name, func) {
-      if (!this.events[name]) {
-        this.events[name] = [func];
+    this.setEvent = function (name, func) {
+      if (!_this.events[name]) {
+        _this.events[name] = [func];
       } else {
-        this.events[name].push(func);
+        _this.events[name].push(func);
         console.log("".concat(name, " event function  is properly set."));
       }
-    }
-  }, {
+    };
+  }
+  _createClass(Eventing, [{
     key: "triggerEvent",
     value: function triggerEvent(funcName) {
       var functions = this.events[funcName];
@@ -570,6 +609,16 @@ exports.Library = void 0;
 var Book_1 = require("../Book/Book");
 var DataBase_1 = require("../DataBase/DataBase");
 var Eventing_1 = require("../Eventing/Eventing");
+var booksAmount = document.getElementById('books-amount');
+var booksCompleted = document.getElementById('books-completed');
+var pagesCompleted = document.getElementById('pages-amount-info');
+var name = document.getElementById('name-edit');
+var surname = document.getElementById('surname-edit');
+var title = document.getElementById('title-edit');
+var pages = document.getElementById('pages-edit');
+var completedPages = document.getElementById('completed_pages-edit');
+var bookCompletion = document.getElementById('bookCompletion-edit');
+var idPut = document.getElementById('bookId'); // ID book for editing.
 var HTMLElementForm = /*#__PURE__*/_createClass(function HTMLElementForm() {
   _classCallCheck(this, HTMLElementForm);
 });
@@ -589,9 +638,26 @@ var Library = /*#__PURE__*/function () {
     this.booksCompleted = 0;
     this.events.setEvent('addingBook', function () {
       _this.showBooks(outputElement);
+      _this.updatePanel();
     });
     this.events.setEvent('deletingBook', function () {
+      console.log('Triggering deletinBook event...');
       _this.showBooks(outputElement);
+      _this.updatePanel();
+    });
+    this.events.setEvent('restoreEditForm', function () {
+      name.value = '';
+      surname.value = '';
+      title.value = '';
+      pages.value = '';
+      completedPages.value = '';
+      bookCompletion.checked = false;
+    });
+    this.events.setEvent('bookEditing', function () {
+      _this.populateWithBooks().then(function () {
+        _this.showBooks(outputElement);
+        _this.updatePanel();
+      });
     });
   }
   _createClass(Library, [{
@@ -599,7 +665,7 @@ var Library = /*#__PURE__*/function () {
     value: function populateWithBooks() {
       return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var _this2 = this;
-        var books, completedPages, booksAmount, totalPages, completedBooks;
+        var books, _completedPages, _booksAmount, totalPages, completedBooks;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -619,10 +685,10 @@ var Library = /*#__PURE__*/function () {
               books.map(function (book) {
                 _this2.books.push(new Book_1.Book(book));
               });
-              completedPages = this.books.reduce(function (accumulator, currentBook) {
+              _completedPages = this.books.reduce(function (accumulator, currentBook) {
                 return accumulator + currentBook.dataBook.date.completedPages;
               }, 0);
-              booksAmount = this.books.length;
+              _booksAmount = this.books.length;
               totalPages = this.books.reduce(function (accumulator, currentBook) {
                 return accumulator + currentBook.dataBook.date.pages;
               }, 0);
@@ -634,8 +700,8 @@ var Library = /*#__PURE__*/function () {
                 return accumulator + counter;
               }, 0);
               this.totalPages = totalPages;
-              this.booksAmount = booksAmount;
-              this.completedPages = completedPages;
+              this.booksAmount = _booksAmount;
+              this.completedPages = _completedPages;
               this.booksCompleted = completedBooks;
               console.log(" populating is finished ");
               _context.next = 24;
@@ -702,7 +768,7 @@ var Library = /*#__PURE__*/function () {
     value: function addBook(root) {
       return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var _this4 = this;
-        var name, surname, title, pages, completedPages, completed, bookButton, message, dataBook, book;
+        var _name, _surname, _title, _pages, _completedPages2, completed, bookButton, message, dataBook, book;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -717,25 +783,25 @@ var Library = /*#__PURE__*/function () {
                 _context4.next = 17;
                 break;
               }
-              name = document.getElementById('name');
-              surname = document.getElementById('surname');
-              title = document.getElementById('title');
-              pages = document.getElementById('pages');
-              completedPages = document.getElementById('completed_pages');
+              _name = document.getElementById('name');
+              _surname = document.getElementById('surname');
+              _title = document.getElementById('title');
+              _pages = document.getElementById('pages');
+              _completedPages2 = document.getElementById('completed_pages');
               completed = document.getElementById('bookCompletion');
               bookButton = document.getElementById('submit');
-              if (pages < completedPages) {
+              if (_pages < _completedPages2) {
                 message = "You can't have more completed pages than actual number of book's pages";
               }
-              if (name && surname && title && pages && completedPages && completed && bookButton) {
+              if (_name && _surname && _title && _pages && _completedPages2 && completed && bookButton) {
                 dataBook = {
-                  title: title.value,
+                  title: _title.value,
                   author: {
-                    name: name.value,
-                    surname: surname.value
+                    name: _name.value,
+                    surname: _surname.value
                   },
-                  pages: parseInt(pages.value),
-                  completedPages: parseInt(completedPages.value),
+                  pages: parseInt(_pages.value),
+                  completedPages: parseInt(_completedPages2.value),
                   completed: completed.checked
                 };
                 book = new Book_1.Book(dataBook);
@@ -745,12 +811,11 @@ var Library = /*#__PURE__*/function () {
                     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
                       while (1) switch (_context3.prev = _context3.next) {
                         case 0:
-                          console.log('saving xdxdxd...');
-                          _context3.next = 3;
+                          _context3.next = 2;
                           return this.populateWithBooks().then(function () {
                             _this5.triggerEvent('addingBook');
                           });
-                        case 3:
+                        case 2:
                         case "end":
                           return _context3.stop();
                       }
@@ -783,6 +848,7 @@ var Library = /*#__PURE__*/function () {
   }, {
     key: "showBooks",
     value: function showBooks(element) {
+      var _this6 = this;
       if (!element) {
         console.log('Root element is undefined');
         return;
@@ -800,10 +866,58 @@ var Library = /*#__PURE__*/function () {
           var div = document.createElement('div');
           div.classList.add("book");
           div.classList.add("".concat(book.getProperty("id")));
-          3;
-          var templateHTML = "\n            <div id=\"titleMenu\">Title: <span>".concat(book.getProperty('title'), "</span></div>\n            <div id=\"authorMenu\">Author: <span>").concat(author.name, " ").concat(author.surname, "</span></div>\n            <div id=\"pages-amount\">Pages: <span>").concat(book.getProperty('pages'), "</span></div>\n            <div id=\"Gcompleted_pages\">Completed Pages: <span>").concat(book.getProperty('completedPages'), "</span></div>\n            <div id=\"buttonsMenu\">\n                <button id=\"dlt-btn").concat(book.getProperty('id'), "\">Delete</button>\n                <button id=\"edit-btn").concat(book.getProperty('id'), "\">Edit</button>\n                <button id=\"completion-btn").concat(book.getProperty('id'), "\">Read</button>\n            </div>\n            <div id=\"status\"><span>").concat(progress, "</span><span>").concat(book.getStatusPercentage.toFixed(0), "%</span></div>");
+          var bookId = book.getProperty('id');
+          var isCompleted = book.getProperty('completed');
+          var templateHTML = "\n            <div id=\"titleMenu\">Title: <span>".concat(book.getProperty('title'), "</span></div>\n            <div id=\"authorMenu\">Author: <span>").concat(author.name, " ").concat(author.surname, "</span></div>\n            <div id=\"pages-amount\">Pages: <span>").concat(book.getProperty('pages'), "</span></div>\n            <div id=\"Gcompleted_pages\">Completed Pages: <span>").concat(book.getProperty('completedPages'), "</span></div>\n            <div id=\"buttonsMenu\">\n                <button id=\"dlt-btn").concat(book.getProperty('id'), "\">Delete</button>\n                <button id=\"edit-btn").concat(book.getProperty('id'), "\">Edit</button>\n                <button id=\"completion-btn").concat(book.getProperty('id'), "\">Read</button>\n            </div>\n            <div id=\"status\"><span id=\"barProgress").concat(bookId, "\">").concat(progress, "</span><span>").concat(book.getStatusPercentage.toFixed(0), "%</span></div>");
           div.innerHTML = templateHTML;
           element.appendChild(div);
+          var buttonDlt = document.getElementById("dlt-btn".concat(bookId));
+          var buttonCompletion = document.getElementById("completion-btn".concat(bookId));
+          var buttonEdit = document.getElementById("edit-btn".concat(bookId));
+          if (buttonDlt && buttonCompletion && buttonEdit) {
+            buttonDlt.addEventListener('click', function () {
+              book.remove().then(function () {
+                _this6.populateWithBooks().then(function () {
+                  _this6.triggerEvent('deletingBook');
+                  _this6.updatePanel();
+                });
+              });
+            });
+            buttonCompletion.addEventListener('click', function () {
+              var barProgress = document.getElementById("barProgress".concat(bookId));
+              if (book.getProperty('completed')) {
+                book.update('completed', false);
+                if (barProgress) {
+                  barProgress.innerHTML = 'On progress';
+                }
+              } else {
+                book.update('completed', true);
+                if (barProgress) {
+                  barProgress.innerHTML = 'read';
+                }
+              }
+            });
+            buttonEdit.addEventListener('click', function () {
+              var bodyElement = document.body;
+              // const child = document.createElement('div');
+              // child.classList.add('editContainer');
+              // child.innerHTML = templateFormEdit;
+              // bodyElement.appendChild(child);
+              var editForm = document.getElementsByClassName('editContainer')[0];
+              // editForm.classList.remove('unactive');
+              editForm.style.height = "".concat(window.innerHeight, "px");
+              editForm.style.width = "".concat(window.innerWidth, "px");
+              // editForm.innerHTML = templateFormEdit;
+              editForm.classList.add('show');
+              idPut.value = "".concat(bookId);
+              name.value = "".concat(author.name);
+              surname.value = "".concat(author.surname);
+              title.value = "".concat(book.getProperty('title'));
+              pages.value = "".concat(book.getProperty('pages'));
+              completedPages.value = "".concat(book.getProperty('completedPages'));
+              bookCompletion.checked = isCompleted;
+            });
+          }
         });
       } else {
         if (this.books.length === 0) {
@@ -812,12 +926,107 @@ var Library = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "editBook",
+    value: function editBook(root) {
+      return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var id, bookTitle, author, bookPages, bookCompletedPages, completed, dataBook, newDataBook;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              if (!(root === null)) {
+                _context5.next = 5;
+                break;
+              }
+              console.log("root element is null");
+              return _context5.abrupt("return");
+            case 5:
+              if (!root.checkValidity()) {
+                _context5.next = 38;
+                break;
+              }
+              id = parseInt(idPut.value);
+              bookTitle = title.value;
+              author = {
+                name: name.value,
+                surname: surname.value
+              };
+              bookPages = parseInt(pages.value);
+              bookCompletedPages = parseInt(completedPages.value);
+              completed = bookCompletion.checked;
+              if (!(bookCompletedPages > bookPages)) {
+                _context5.next = 17;
+                break;
+              }
+              alert('completed pages are greater than actual book pages!');
+              pages.value = '';
+              completedPages.value = '';
+              return _context5.abrupt("return");
+            case 17:
+              if (!(bookCompletedPages < 0 || bookPages < 0)) {
+                _context5.next = 22;
+                break;
+              }
+              alert('Negative numbers are not allowed :(');
+              pages.value = '';
+              completedPages.value = '';
+              return _context5.abrupt("return");
+            case 22:
+              if (bookPages === 0) {
+                alert('Books that have 0 pages are quick to read, right?');
+                pages.value = '';
+              }
+              if (bookPages === bookCompletedPages) {
+                completed = true;
+              }
+              _context5.next = 26;
+              return this.db.get(id).then(function (book) {
+                return book;
+              });
+            case 26:
+              dataBook = _context5.sent;
+              newDataBook = {
+                title: bookTitle,
+                author: author,
+                pages: bookPages,
+                completedPages: bookCompletedPages,
+                completed: completed
+              };
+              console.log(newDataBook);
+              if (!(dataBook === newDataBook)) {
+                _context5.next = 34;
+                break;
+              }
+              console.log('Items are the same. Updating is stopped...');
+              return _context5.abrupt("return");
+            case 34:
+              _context5.next = 36;
+              return this.db.updateItem(id, newDataBook);
+            case 36:
+              this.triggerEvent('bookEditing');
+              this.triggerEvent('restoreEditForm');
+            case 38:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, this);
+      }));
+    }
+  }, {
     key: "restoreToDefault",
     value: function restoreToDefault() {
       this.totalPages = 0;
       this.booksAmount = 0;
       this.completedPages = 0;
       this.booksCompleted = 0;
+    }
+  }, {
+    key: "updatePanel",
+    value: function updatePanel() {
+      if (booksAmount && booksCompleted && pagesCompleted) {
+        booksAmount.innerHTML = "".concat(this.getTotalBooks);
+        booksCompleted.innerHTML = "".concat(this.getBooksCompleted);
+        pagesCompleted.innerHTML = "".concat(this.getCompletedPages);
+      }
     }
   }]);
   return Library;
@@ -834,6 +1043,7 @@ var toggleButton = document.getElementById('togglerCheckbox');
 var slide = document.getElementsByClassName('slide-in');
 var listOfBooks = document.getElementsByClassName('grid-books');
 var form = document.getElementById('commentform');
+var formEdit = document.getElementById('commentform-edit');
 var formButton = document.getElementById('submit');
 var gridList = document.getElementById('grid-books');
 var mainBox = document.getElementById('main');
@@ -846,6 +1056,9 @@ var booksAmount = document.getElementById('books-amount');
 var booksCompleted = document.getElementById('books-completed');
 var pagesCompleted = document.getElementById('pages-amount-info');
 var deleteBttn = document.getElementById('deleteBtn');
+var editForm = document.getElementById('commentform-edit');
+var editExitBtn = document.getElementById('exitBtn');
+var editFormContainer = document.getElementsByClassName('editContainer')[0];
 if (toggleButton && gridList && element && bottomContainer && deleteBttn) {
   toggleButton.addEventListener('change', function () {
     if (this.checked) {
@@ -893,6 +1106,16 @@ if (form && gridList) {
               }
             });
           });
+          editForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            library.editBook(editForm);
+          });
+          if (editExitBtn) {
+            editExitBtn.addEventListener('click', function () {
+              editFormContainer.classList.remove('show');
+              library.triggerEvent('restoreEditForm');
+            });
+          }
           if (deleteBttn) {
             deleteBttn.addEventListener('click', function () {
               library.removeAllBooks();
@@ -907,17 +1130,6 @@ if (form && gridList) {
     });
   }
 }
-// library.populateWithBooks().then(() => {
-//     if (library.books.length === 0) {
-//         setTimeout(() => {
-//             return;
-//         }, 300)
-//
-//     }
-// library.events.triggerEvent('addingBook');
-// book1.save();
-// library.showBooks(gridList);library.removeAllBooks();
-// });
 },{"./Library/Library":"src/Library/Library.ts"}],"../../../../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -943,7 +1155,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49656" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49694" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

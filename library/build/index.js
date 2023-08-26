@@ -5,6 +5,7 @@ const toggleButton = document.getElementById('togglerCheckbox');
 const slide = document.getElementsByClassName('slide-in');
 const listOfBooks = document.getElementsByClassName('grid-books');
 const form = document.getElementById('commentform');
+const formEdit = document.getElementById('commentform-edit');
 const formButton = document.getElementById('submit');
 const gridList = document.getElementById('grid-books');
 const mainBox = document.getElementById('main');
@@ -17,6 +18,9 @@ const booksAmount = document.getElementById('books-amount');
 const booksCompleted = document.getElementById('books-completed');
 const pagesCompleted = document.getElementById('pages-amount-info');
 const deleteBttn = document.getElementById('deleteBtn');
+const editForm = document.getElementById('commentform-edit');
+const editExitBtn = document.getElementById('exitBtn');
+const editFormContainer = document.getElementsByClassName('editContainer')[0];
 if (toggleButton && gridList && element && bottomContainer && deleteBttn) {
     toggleButton.addEventListener('change', function () {
         if (this.checked) {
@@ -66,6 +70,16 @@ if (form && gridList) {
                             }
                         });
                     });
+                    editForm.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        library.editBook(editForm);
+                    });
+                    if (editExitBtn) {
+                        editExitBtn.addEventListener('click', () => {
+                            editFormContainer.classList.remove('show');
+                            library.triggerEvent('restoreEditForm');
+                        });
+                    }
                     if (deleteBttn) {
                         deleteBttn.addEventListener('click', () => {
                             library.removeAllBooks();
@@ -82,14 +96,3 @@ if (form && gridList) {
         });
     }
 }
-// library.populateWithBooks().then(() => {
-//     if (library.books.length === 0) {
-//         setTimeout(() => {
-//             return;
-//         }, 300)
-//
-//     }
-// library.events.triggerEvent('addingBook');
-// book1.save();
-// library.showBooks(gridList);library.removeAllBooks();
-// });

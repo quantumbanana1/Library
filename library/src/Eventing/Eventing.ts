@@ -12,12 +12,12 @@ export class Eventing {
 
     }
 
-    setEvent(name: string, func: () =>{}): void {
+    setEvent = (name: string, func: () => void):void => {
         if (!this.events[name]) {
-            this.events[name] = [func];
+            this.events[name] = [func as any];
         }
         else {
-            this.events[name].push(func);
+            this.events[name].push(func as any);
             console.log(`${name} event function  is properly set.`)
         }
 

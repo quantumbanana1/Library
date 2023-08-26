@@ -5,6 +5,7 @@ const toggleButton = document.getElementById('togglerCheckbox');
 const slide = document.getElementsByClassName('slide-in');
 const listOfBooks = document.getElementsByClassName('grid-books');
 const form: HTMLFormElement = document.getElementById('commentform');
+const formEdit: HTMLFormElement = document.getElementById('commentform-edit');
 const formButton = document.getElementById('submit');
 const gridList = document.getElementById('grid-books')
 const mainBox = document.getElementById('main');
@@ -17,6 +18,11 @@ const booksAmount = document.getElementById('books-amount');
 const booksCompleted = document.getElementById('books-completed');
 const pagesCompleted = document.getElementById('pages-amount-info');
 const deleteBttn = document.getElementById('deleteBtn')
+const editForm = document.getElementById('commentform-edit') as HTMLFormElement;
+const editExitBtn = document.getElementById('exitBtn')
+const editFormContainer = document.getElementsByClassName('editContainer')[0];
+
+
 
 
 import {Book, IBook} from "./Book/Book";
@@ -56,6 +62,8 @@ if (toggleButton && gridList && element && bottomContainer && deleteBttn) {
 
 let library: Library;
 
+
+
 if (form && gridList) {
     library = new Library([], form, gridList);
     if (library) {
@@ -82,7 +90,27 @@ if (form && gridList) {
                                 }
                             });
                         })
-                        if (deleteBttn) {
+
+                        editForm.addEventListener('submit', (event:SubmitEvent) => {
+                            event.preventDefault();
+                            library.editBook(editForm);
+
+                        })
+
+                        if (editExitBtn) {
+                            editExitBtn.addEventListener('click', ()=> {
+                                editFormContainer.classList.remove('show');
+                                library.triggerEvent('restoreEditForm');
+
+                            })
+                            
+                            
+                            
+                            
+                        }
+
+
+                        if (deleteBttn )  {
                             deleteBttn.addEventListener('click', () => {
                                 library.removeAllBooks();
                             });
@@ -106,21 +134,6 @@ if (form && gridList) {
 }
 
 
-// library.populateWithBooks().then(() => {
-//     if (library.books.length === 0) {
-//         setTimeout(() => {
-//             return;
-//         }, 300)
-//
-//     }
-
-
-// library.events.triggerEvent('addingBook');
-// book1.save();
-// library.showBooks(gridList);library.removeAllBooks();
-
-
-// });
 
 
 

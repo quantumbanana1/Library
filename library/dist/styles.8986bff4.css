@@ -1,3 +1,6 @@
+
+
+
 html, body {
     margin: 0;
     height: 100%;
@@ -498,6 +501,115 @@ input[type="checkbox"]::before {
     z-index: -1;
 
 }
+.editContainer {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    background-color: rgba(5, 5, 5, 0.67);
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    /* border: 1px solid rgb(89, 250, 156); */
+    transform: scale(0);
+    transition: opacity .35s, transform .35s;
+
+
+}
+
+.editContainer.show {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    z-index: 99;
+}
+
+
+.header-edit-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+}
+
+.header-edit-form >  .form-sentence {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    padding-left: 20px;
+}
+
+
+
+.header-edit-form > button{
+    justify-content: center;
+    display: flex;
+    width: 30px;
+    height: 30px;
+    border-style: none;
+    background-color: rgba(109, 42, 42, 0);
+    border-radius: 100%;
+
+
+
+}
+
+.header-edit-form > button > img {
+    width: 30px;
+    height: 30px;
+}
+
+
+
+.container-form-edit {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    height: 70%;
+    border-top: 2px solid rgb(241, 238, 238);
+    border-bottom: 2px solid rgb(241, 238, 238);
+    border-radius: 0.5rem;
+    background-color: rgba(10, 10, 8, 0.43);
+    box-shadow: 3.5px 3.5px 4px 2px rgba(0, 0, 0, 0.3);
+
+
+}
+
+.container-form-edit > .comment-form-edit {
+    width: 50%;
+    height: 70%;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.container-form-edit > .comment-form-edit > .form-form {
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+}
+.editContainer.unactive {
+    background-color: rgba(255, 255, 255, 0);
+    z-index: -3;
+    position: absolute;
+    right: 0;
+    left: 0;
+}
+
+.row-input-edit {
+    width: 100%;
+    position: relative;
+}
+
+
 
 
 

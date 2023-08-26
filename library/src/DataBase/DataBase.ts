@@ -46,8 +46,8 @@ export class DataBase<T> {
                 console.log("Connection failure");
                 throw new Error("Failed to fetch items from the database.");
             }
-            const items = await response.json().then((books) => {
-                return books
+            const items = await response.json().then((item) => {
+                return item
             })
             return items;
 
@@ -60,12 +60,8 @@ export class DataBase<T> {
     }
 
     async updateItem(id: number, newData: T) {
-        const response = await fetch(this.url + `/${id}`);
-        try {
-            if (!response.ok) {
-                throw new Error("Failure occurred while updating")
 
-            }
+        try {
             const requestOptions = {
                 method: "PUT", // or "PATCH" depending on your API
                 headers: {
@@ -73,10 +69,15 @@ export class DataBase<T> {
                 },
                 body: JSON.stringify(newData),
             };
+            const response = await fetch(this.url + `/${id}`, requestOptions);
+            if (!response.ok) {
+                throw new Error("Failure occurred while updating")
 
+            }
 
-            const item = response.json()
-            console.log(`Successfully updated ${item}`)
+            const item = await response.json
+            console.log(`Successfully updated item with new date - ${newData}`)
+            return item;
 
 
         } catch (error) {
@@ -109,6 +110,25 @@ export class DataBase<T> {
         } catch (error: any) {
             console.error(error);
 
+        }
+
+
+    }
+
+
+    async get(id:number): Promise<T> {
+        let data;
+        try {
+            const response = await fetch(this.url+`/${id}`)
+            if (!response.ok) {
+                console.log("Connection failure");
+                throw new Error("Failed to fetch items from the database.");
+            }
+            const item: Promise<T> = response.json();
+            return item;
+
+        } catch (error) {
+            console.error(error.message)
         }
 
 

@@ -42,5 +42,8 @@ class Book {
     getProperty(key) {
         return this.dataBook.get(key);
     }
+    put(id, date) {
+        return this.db.updateItem(id, date);
+    }
 }
 exports.Book = Book;

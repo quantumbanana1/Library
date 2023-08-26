@@ -47,8 +47,8 @@ class DataBase {
                     console.log("Connection failure");
                     throw new Error("Failed to fetch items from the database.");
                 }
-                const items = yield response.json().then((books) => {
-                    return books;
+                const items = yield response.json().then((item) => {
+                    return item;
                 });
                 return items;
             }
@@ -59,11 +59,7 @@ class DataBase {
     }
     updateItem(id, newData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(this.url + `/${id}`);
             try {
-                if (!response.ok) {
-                    throw new Error("Failure occurred while updating");
-                }
                 const requestOptions = {
                     method: "PUT",
                     headers: {
@@ -71,8 +67,13 @@ class DataBase {
                     },
                     body: JSON.stringify(newData),
                 };
-                const item = response.json();
-                console.log(`Successfully updated ${item}`);
+                const response = yield fetch(this.url + `/${id}`, requestOptions);
+                if (!response.ok) {
+                    throw new Error("Failure occurred while updating");
+                }
+                const item = yield response.json;
+                console.log(`Successfully updated item with new date - ${newData}`);
+                return item;
             }
             catch (error) {
                 console.error(error.message);
@@ -97,6 +98,23 @@ class DataBase {
             }
             catch (error) {
                 console.error(error);
+            }
+        });
+    }
+    get(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data;
+            try {
+                const response = yield fetch(this.url + `/${id}`);
+                if (!response.ok) {
+                    console.log("Connection failure");
+                    throw new Error("Failed to fetch items from the database.");
+                }
+                const item = response.json();
+                return item;
+            }
+            catch (error) {
+                console.error(error.message);
             }
         });
     }

@@ -4,15 +4,15 @@ exports.Eventing = void 0;
 class Eventing {
     constructor(events = {}) {
         this.events = events;
-    }
-    setEvent(name, func) {
-        if (!this.events[name]) {
-            this.events[name] = [func];
-        }
-        else {
-            this.events[name].push(func);
-            console.log(`${name} event function  is properly set.`);
-        }
+        this.setEvent = (name, func) => {
+            if (!this.events[name]) {
+                this.events[name] = [func];
+            }
+            else {
+                this.events[name].push(func);
+                console.log(`${name} event function  is properly set.`);
+            }
+        };
     }
     triggerEvent(funcName) {
         const functions = this.events[funcName];

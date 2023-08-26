@@ -55,8 +55,13 @@ export class Book {
         return this.dataBook.update(key, date)
     }
 
-    getProperty<K extends keyof IBook>(key: K) {
+    getProperty<K extends keyof IBook>(key: K)  {
         return this.dataBook.get(key);
+    }
+
+    put(id:number, date: IBook) {
+        return this.db.updateItem(id, date)
+
     }
 
 

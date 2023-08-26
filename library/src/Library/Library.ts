@@ -1,6 +1,19 @@
 import {Book, IBook} from "../Book/Book";
 import {DataBase} from "../DataBase/DataBase";
 import {Eventing} from "../Eventing/Eventing";
+import {IAuthor} from "../Author/Author";
+import {templateFormEdit} from "./templateHTML";
+
+const booksAmount = document.getElementById('books-amount');
+const booksCompleted = document.getElementById('books-completed');
+const pagesCompleted = document.getElementById('pages-amount-info');
+const name = document.getElementById('name-edit') as HTMLInputElement;
+const surname = document.getElementById('surname-edit') as HTMLInputElement;
+const title = document.getElementById('title-edit') as HTMLInputElement;
+const pages = document.getElementById('pages-edit') as HTMLInputElement;
+const completedPages = document.getElementById('completed_pages-edit') as HTMLInputElement;
+const bookCompletion = document.getElementById('bookCompletion-edit') as HTMLInputElement;
+const idPut = document.getElementById('bookId') as HTMLInputElement;// ID book for editing.
 
 
 class HTMLElementForm {
@@ -17,7 +30,7 @@ export class Library {
     public booksAmount: number
     public booksCompleted: number
 
-    constructor(books: Book[] = [], elementForm: HTMLElementForm,outputElement:HTMLElement) {
+    constructor(books: Book[] = [], elementForm: HTMLElementForm, outputElement: HTMLElement) {
         this.books = books;
         this.events = new Eventing();
         this.totalPages = 0;
@@ -26,9 +39,29 @@ export class Library {
         this.booksCompleted = 0;
         this.events.setEvent('addingBook', () => {
             this.showBooks(outputElement)
+            this.updatePanel();
         })
         this.events.setEvent('deletingBook', () => {
+            console.log('Triggering deletinBook event...')
             this.showBooks(outputElement);
+            this.updatePanel();
+        })
+
+        this.events.setEvent('restoreEditForm', () => {
+            name.value = '';
+            surname.value = '';
+            title.value = '';
+            pages.value = '';
+            completedPages.value = '';
+            bookCompletion.checked = false;
+        })
+
+        this.events.setEvent('bookEditing', () => {
+            this.populateWithBooks().then(()=>{
+                this.showBooks(outputElement);
+                this.updatePanel();
+            });
+
         })
 
     }
@@ -54,13 +87,13 @@ export class Library {
 
             }, 0);
 
-            const completedBooks = this.books.reduce((accumulator:number, currentBook:Book):number => {
+            const completedBooks = this.books.reduce((accumulator: number, currentBook: Book): number => {
                 let counter = 0;
                 if (currentBook.dataBook.date.completed) {
                     counter++;
                 }
                 return accumulator + counter;
-            },0)
+            }, 0)
 
             this.totalPages = totalPages;
             this.booksAmount = booksAmount;
@@ -78,7 +111,7 @@ export class Library {
     }
 
 
-    get getTotalBooks():number {
+    get getTotalBooks(): number {
         return this.booksAmount
 
 
@@ -95,8 +128,8 @@ export class Library {
 
     }
 
-        removeAllBooks() {
-         this.populateWithBooks().then(() => {
+    removeAllBooks() {
+        this.populateWithBooks().then(() => {
             if (this.books.length === 0) {
                 console.log("No record to delete")
 
@@ -146,7 +179,6 @@ export class Library {
 
                     const book = new Book(dataBook)
                     book.save().then(async () => {
-                        console.log('saving xdxdxd...')
                         await this.populateWithBooks().then(() => {
                             this.triggerEvent('addingBook')
                         });
@@ -183,9 +215,6 @@ export class Library {
         element.innerHTML = ''
 
 
-
-
-
         if (this.books.length !== 0) {
             let progress = '';
             this.books.forEach((book: Book) => {
@@ -195,12 +224,13 @@ export class Library {
                 } else {
                     progress = 'On progress';
                 }
-
-                const author = book.getProperty('author');
+                const author: IAuthor = book.getProperty('author');
                 const div = document.createElement('div');
                 div.classList.add(`book`);
                 div.classList.add(`${book.getProperty("id")}`)
-                3
+                const bookId: number = book.getProperty('id');
+                const isCompleted: boolean = book.getProperty('completed');
+
                 const templateHTML = `
             <div id="titleMenu">Title: <span>${book.getProperty('title')}</span></div>
             <div id="authorMenu">Author: <span>${author.name} ${author.surname}</span></div>
@@ -211,14 +241,72 @@ export class Library {
                 <button id="edit-btn${book.getProperty('id')}">Edit</button>
                 <button id="completion-btn${book.getProperty('id')}">Read</button>
             </div>
-            <div id="status"><span>${progress}</span><span>${book.getStatusPercentage.toFixed(0)}%</span></div>`;
+            <div id="status"><span id="barProgress${bookId}">${progress}</span><span>${book.getStatusPercentage.toFixed(0)}%</span></div>`;
 
                 div.innerHTML = templateHTML;
                 element.appendChild(div);
+                const buttonDlt = document.getElementById(`dlt-btn${bookId}`);
+                const buttonCompletion = document.getElementById(`completion-btn${bookId}`);
+                const buttonEdit = document.getElementById(`edit-btn${bookId}`);
+                if (buttonDlt && buttonCompletion && buttonEdit) {
+                    buttonDlt.addEventListener('click', () => {
+                        book.remove().then(() => {
+                            this.populateWithBooks().then(() => {
+                                this.triggerEvent('deletingBook')
+                                this.updatePanel();
+                            })
+                        });
+                    })
+
+                    buttonCompletion.addEventListener('click', () => {
+                        const barProgress = document.getElementById(`barProgress${bookId}`);
+
+                        if (book.getProperty('completed')) {
+                            book.update('completed', false);
+                            if (barProgress) {
+                                barProgress.innerHTML = 'On progress';
+                            }
+
+                        } else {
+                            book.update('completed', true)
+                            if (barProgress) {
+                                barProgress.innerHTML = 'read';
+                            }
+                        }
+
+
+                    })
+
+                    buttonEdit.addEventListener('click', () => {
+                        const bodyElement = document.body;
+                        // const child = document.createElement('div');
+                        // child.classList.add('editContainer');
+                        // child.innerHTML = templateFormEdit;
+                        // bodyElement.appendChild(child);
+                        const editForm = document.getElementsByClassName('editContainer')[0];
+                        // editForm.classList.remove('unactive');
+                        editForm.style.height = `${window.innerHeight}px`;
+                        editForm.style.width = `${window.innerWidth}px`;
+                        // editForm.innerHTML = templateFormEdit;
+                        editForm.classList.add('show');
+                        idPut.value = `${bookId}`;
+                        name.value = `${author.name}`;
+                        surname.value = `${author.surname}`;
+                        title.value = `${book.getProperty('title')}`;
+                        pages.value = `${book.getProperty('pages')}`;
+                        completedPages.value = `${book.getProperty('completedPages')}`
+                        bookCompletion.checked = isCompleted;
+
+
+                    })
+
+
+                }
+
             });
 
         } else {
-            if (this.books.length === 0 ) {
+            if (this.books.length === 0) {
                 element.innerHTML = '';
             }
         }
@@ -226,12 +314,92 @@ export class Library {
 
     }
 
+    async editBook(root: HTMLFormElement) {
 
-    restoreToDefault():void {
-        this.totalPages = 0
-        this.booksAmount = 0
-        this.completedPages = 0
-        this.booksCompleted = 0
+        if (root === null) {
+            console.log("root element is null");
+            return;
+        } else {
+            if (root.checkValidity()) {
+                const id:number = parseInt(idPut.value);
+                const bookTitle: string = title.value;
+                const author: IAuthor = {name: name.value, surname: surname.value};
+                const bookPages: number = parseInt(pages.value);
+                const bookCompletedPages: number = parseInt(completedPages.value);
+                let completed: boolean = bookCompletion.checked;
+
+                if (bookCompletedPages > bookPages) {
+                    alert('completed pages are greater than actual book pages!');
+                    pages.value = '';
+                    completedPages.value = '';
+                    return;
+                }
+
+                if (bookCompletedPages < 0 || bookPages < 0 ) {
+                    alert('Negative numbers are not allowed :(');
+                    pages.value = '';
+                    completedPages.value = '';
+                    return;
+
+                }
+
+                if (bookPages === 0) {
+                    alert('Books that have 0 pages are quick to read, right?')
+                    pages.value = '';
+                }
+
+                if (bookPages === bookCompletedPages) {
+                    completed = true;
+                }
+
+                const dataBook:IBook = await this.db.get(id).then((book:IBook) => {
+                    return book
+                })
+
+                const newDataBook:IBook = {
+                    title: bookTitle,
+                    author: author,
+                    pages: bookPages,
+                    completedPages: bookCompletedPages,
+                    completed: completed
+                }
+
+                console.log(newDataBook);
+
+                if (dataBook === newDataBook) {
+                    console.log('Items are the same. Updating is stopped...');
+                    return;
+                } else {
+
+                    await this.db.updateItem(id, newDataBook);
+                    this.triggerEvent('bookEditing');
+                    this.triggerEvent('restoreEditForm');
+
+                }
+
+
+
+            }
+        }
+
+    }
+
+
+    restoreToDefault(): void {
+        this.totalPages = 0;
+        this.booksAmount = 0;
+        this.completedPages = 0;
+        this.booksCompleted = 0;
+
+    }
+
+    updatePanel(): void {
+        if (booksAmount && booksCompleted && pagesCompleted) {
+            booksAmount.innerHTML = `${this.getTotalBooks}`;
+            booksCompleted.innerHTML = `${this.getBooksCompleted}`;
+            pagesCompleted.innerHTML = `${this.getCompletedPages}`;
+        }
+
 
     }
 
