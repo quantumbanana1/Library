@@ -768,7 +768,7 @@ var Library = /*#__PURE__*/function () {
     value: function addBook(root) {
       return __awaiter(this, void 0, void 0, /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var _this4 = this;
-        var _name, _surname, _title, _pages, _completedPages2, completed, bookButton, message, dataBook, book;
+        var _name, _surname, _title, _pages, _completedPages2, completed, bookButton, dataBook, book;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -780,7 +780,7 @@ var Library = /*#__PURE__*/function () {
               return _context4.abrupt("return");
             case 5:
               if (!root.checkValidity()) {
-                _context4.next = 17;
+                _context4.next = 24;
                 break;
               }
               _name = document.getElementById('name');
@@ -791,7 +791,27 @@ var Library = /*#__PURE__*/function () {
               completed = document.getElementById('bookCompletion');
               bookButton = document.getElementById('submit');
               if (_pages < _completedPages2) {
-                message = "You can't have more completed pages than actual number of book's pages";
+                alert("You can't have more completed pages than actual number of book's pages");
+                _pages.value = '';
+              }
+              if (!(parseInt(_pages.value) < 0 || parseInt(_completedPages2.value) < 0)) {
+                _context4.next = 19;
+                break;
+              }
+              alert('negative pages are invalid.');
+              if (parseInt(_pages.value) < 0) {
+                _pages.value = '';
+              }
+              if (parseInt(_completedPages2.value) < 0) {
+                _completedPages2.value = '';
+              }
+              return _context4.abrupt("return");
+            case 19:
+              if (parseInt(_pages.value) === parseInt(_completedPages2.value)) {
+                completed.checked = true;
+              }
+              if (parseInt(_pages.value) > parseInt(_completedPages2.value)) {
+                completed.checked = false;
               }
               if (_name && _surname && _title && _pages && _completedPages2 && completed && bookButton) {
                 dataBook = {
@@ -823,12 +843,12 @@ var Library = /*#__PURE__*/function () {
                   }));
                 });
               }
-              _context4.next = 19;
+              _context4.next = 26;
               break;
-            case 17:
+            case 24:
               console.log('Incorrect input values from form');
               return _context4.abrupt("return");
-            case 19:
+            case 26:
             case "end":
               return _context4.stop();
           }
@@ -885,15 +905,26 @@ var Library = /*#__PURE__*/function () {
             });
             buttonCompletion.addEventListener('click', function () {
               var barProgress = document.getElementById("barProgress".concat(bookId));
+              var id = bookId;
               if (book.getProperty('completed')) {
                 book.update('completed', false);
                 if (barProgress) {
                   barProgress.innerHTML = 'On progress';
+                  _this6.db.updateItem(id, book.dataBook.date).then(function () {
+                    console.log(book.dataBook.date);
+                    console.log('yolo');
+                    _this6.triggerEvent('bookEditing');
+                  });
                 }
               } else {
                 book.update('completed', true);
                 if (barProgress) {
                   barProgress.innerHTML = 'read';
+                  _this6.db.updateItem(id, book.dataBook.date).then(function () {
+                    console.log(book.dataBook.date);
+                    console.log('yolo');
+                    _this6.triggerEvent('bookEditing');
+                  });
                 }
               }
             });
@@ -941,7 +972,7 @@ var Library = /*#__PURE__*/function () {
               return _context5.abrupt("return");
             case 5:
               if (!root.checkValidity()) {
-                _context5.next = 38;
+                _context5.next = 39;
                 break;
               }
               id = parseInt(idPut.value);
@@ -978,11 +1009,14 @@ var Library = /*#__PURE__*/function () {
               if (bookPages === bookCompletedPages) {
                 completed = true;
               }
-              _context5.next = 26;
+              if (bookPages > bookCompletedPages) {
+                completed = false;
+              }
+              _context5.next = 27;
               return this.db.get(id).then(function (book) {
                 return book;
               });
-            case 26:
+            case 27:
               dataBook = _context5.sent;
               newDataBook = {
                 title: bookTitle,
@@ -992,19 +1026,19 @@ var Library = /*#__PURE__*/function () {
                 completed: completed
               };
               console.log(newDataBook);
-              if (!(dataBook === newDataBook)) {
-                _context5.next = 34;
+              if (!(dataBook == newDataBook)) {
+                _context5.next = 35;
                 break;
               }
               console.log('Items are the same. Updating is stopped...');
               return _context5.abrupt("return");
-            case 34:
-              _context5.next = 36;
+            case 35:
+              _context5.next = 37;
               return this.db.updateItem(id, newDataBook);
-            case 36:
+            case 37:
               this.triggerEvent('bookEditing');
               this.triggerEvent('restoreEditForm');
-            case 38:
+            case 39:
             case "end":
               return _context5.stop();
           }
@@ -1155,7 +1189,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49694" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49665" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

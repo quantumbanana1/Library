@@ -135,7 +135,24 @@ class Library {
                     const completed = document.getElementById('bookCompletion');
                     const bookButton = document.getElementById('submit');
                     if (pages < completedPages) {
-                        const message = "You can't have more completed pages than actual number of book's pages";
+                        alert("You can't have more completed pages than actual number of book's pages");
+                        pages.value = '';
+                    }
+                    if (parseInt(pages.value) < 0 || parseInt(completedPages.value) < 0) {
+                        alert('negative pages are invalid.');
+                        if (parseInt(pages.value) < 0) {
+                            pages.value = '';
+                        }
+                        if (parseInt(completedPages.value) < 0) {
+                            completedPages.value = '';
+                        }
+                        return;
+                    }
+                    if (parseInt(pages.value) === parseInt(completedPages.value)) {
+                        completed.checked = true;
+                    }
+                    if (parseInt(pages.value) > parseInt(completedPages.value)) {
+                        completed.checked = false;
                     }
                     if (name && surname && title && pages && completedPages && completed && bookButton) {
                         const dataBook = {
@@ -214,16 +231,27 @@ class Library {
                     });
                     buttonCompletion.addEventListener('click', () => {
                         const barProgress = document.getElementById(`barProgress${bookId}`);
+                        const id = bookId;
                         if (book.getProperty('completed')) {
                             book.update('completed', false);
                             if (barProgress) {
                                 barProgress.innerHTML = 'On progress';
+                                this.db.updateItem(id, book.dataBook.date).then(() => {
+                                    console.log(book.dataBook.date);
+                                    console.log('yolo');
+                                    this.triggerEvent('bookEditing');
+                                });
                             }
                         }
                         else {
                             book.update('completed', true);
                             if (barProgress) {
                                 barProgress.innerHTML = 'read';
+                                this.db.updateItem(id, book.dataBook.date).then(() => {
+                                    console.log(book.dataBook.date);
+                                    console.log('yolo');
+                                    this.triggerEvent('bookEditing');
+                                });
                             }
                         }
                     });
@@ -289,6 +317,9 @@ class Library {
                     if (bookPages === bookCompletedPages) {
                         completed = true;
                     }
+                    if (bookPages > bookCompletedPages) {
+                        completed = false;
+                    }
                     const dataBook = yield this.db.get(id).then((book) => {
                         return book;
                     });
@@ -300,7 +331,7 @@ class Library {
                         completed: completed
                     };
                     console.log(newDataBook);
-                    if (dataBook === newDataBook) {
+                    if (dataBook == newDataBook) {
                         console.log('Items are the same. Updating is stopped...');
                         return;
                     }
